@@ -1,0 +1,38 @@
+import machine
+from time import sleep
+from machine import Pin
+
+adc = machine.ADC()
+sensor = adc.channel(pin='P16', attn=machine.ADC.ATTN_11DB)
+
+def read_sensor(sensor):
+    print("Moisture value: {0}" .format(sensor()))
+    READING_DELAY_IN_S = 2
+    NUM_READINGS = 5
+    total = 0
+    for i in range(0, NUM_READINGS):
+        sleep(READING_DELAY_IN_S)
+        sensor_reading = sensor()
+        print('Moisture value: {0}'.format(sensor()))
+        total += sensor_reading
+    average_reading = int(total/NUM_READINGS)
+    print("Average moisture: {0}" .format(sensor()))
+    return average_reading
+
+def check_plant(sensor_reading):
+    LOW_VALUE = 1800
+    HIGH_VALUE = 3500
+    if sensor_reading >= LOW_VALUE and sensor_reading <= HIGH_VALUE:
+        print("The Plant is living a good life".format(LOW_VALUE, HIGH_VALUE))
+
+    elif LOW_VALUE > sensor_reading:
+        print("The Plant is drowning".format(LOW_VALUE))
+
+    elif HIGH_VALUE < sensor_reading:
+        print("The Plant needs a refill".format(HIGH_VALUE))
+
+while True:
+    average_reading = read_sensor(sensor)
+    pybytes.send_signal(1, average_reading)
+    check_plant(average_reading)
+    sleep(5)
